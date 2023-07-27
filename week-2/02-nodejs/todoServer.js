@@ -39,11 +39,104 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-const express = require('express');
-const bodyParser = require('body-parser');
+
+const fs = require("fs");
+
+
+let counter = 1;
+
+function getUniqueNumber(){
+  return counter++;
+}
+
+const filepath = "./todos.json"
+
+function readTodos(){
+  let todos = fs.readFileSync(filepath);
+  return JSON.parse(todos);
+}
+
+function writeTodos(){
+  fs.writeFileSync(filepath, JSON.stringify(todos, null, 1));
+}
+
+// const todos = [
+//   { id: getUniqueNumber(), title: "do job" },
+//   { id: getUniqueNumber(), title: "get bored and die" },
+// ];
+const todos = readTodos();
+
+function getAllTodos(req, res) {
+  res.json(todos);
+}
+
+function getTodoById(req, res) {
+  const id = req.params.id;
+  for(let task of todos){
+    if(task['id']==id){
+      res.json(task);
+      return;
+    }
+  }
+  res.status(404).send();
+}
+
+function createTodo(req, res){
+  const id = getUniqueNumber();
+  const obj = req.body;
+  obj['id']=id;
+  todos.push(obj);
+  writeTodos();
+  res.status(201).json(obj);
+}
+
+function updateTodo(req, res){
+  const id = req.params.id;
+  for(let task of todos){
+    if(task['id']==id){
+      task = req.body;
+      task['id']=id;
+      res.json(task);
+      writeTodos();
+      return;
+    }
+  }
+  res.status(404).send();
+}
+
+function deleteTodo(req, res){
+  const id = req.params.id;
+  let idx = 0;
+  while(idx < todos.length){
+    if(todos[idx]['id']==id)
+      break;
+    idx++;
+  }
+  if(idx<todos.length){
+    todos.splice(idx, 1);
+    writeTodos();
+    res.send();
+  }
+  else{
+    res.status(404).send();
+  }
+}
+
+const express = require("express");
+const bodyParser = require("body-parser");
+const port = 3000;
 
 const app = express();
 
 app.use(bodyParser.json());
+app.get("/todos", getAllTodos);
+app.get("/todos/:id", getTodoById);
+app.post("/todos", createTodo);
+app.put("/todos/:id", updateTodo);
+app.delete("/todos/:id", deleteTodo);
+
+// app.all('*', (req, res) => {res.status(404).send();});
+
+// app.listen(port, () => console.log('Server running on port 3000!'));
 
 module.exports = app;
