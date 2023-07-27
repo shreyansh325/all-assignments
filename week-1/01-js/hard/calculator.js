@@ -17,6 +17,50 @@
   - `npm run test-calculator`
 */
 
-class Calculator {}
+class Calculator {
+  result;
+  constructor(res=0){
+    this.result=res;
+  }
+  validate(n){
+    if(isNaN(n))
+      throw new Error("Invalid Input.");
+  }
+  add(n){
+    this.validate(n);
+    this.result+=n;
+  }
+  subtract(n){
+    this.validate(n);
+    this.result-=n;
+  }
+  multiply(n){
+    this.validate(n);
+    this.result*=n;
+  }
+  divide(n){
+    this.validate(n);
+    if(n === 0)
+      throw new Error("Attempt to divide by zero.");
+    this.result/=n;
+  }
+  clear(){
+    this.result=0;
+  }
+  getResult(){
+    return this.result;
+  }
+  calculate(expr){
+    expr=expr.replace(/ /g,'');
+    const validExpr = /^[\d+\-*/().]+$/;
+    if(!validExpr.test(expr))
+      throw new Error("Invalid Expression.");
+    
+    const result = Function("return "+expr+";")();
+    if(isNaN(result) || result === Infinity || result === -Infinity)
+      throw new Error("Invalid Expression");
+    this.result = result;
+  }
+}
 
 module.exports = Calculator;

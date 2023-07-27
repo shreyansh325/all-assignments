@@ -3,6 +3,9 @@
  * During this time the thread should not be able to do anything else.
  */
 
-function sleep (seconds) {
-
+function sleep (ms) {
+    let startTime = new Date().getTime();
+    while(new Date().getTime()<startTime+ms);
+    console.log("Exiting!");
 }
+sleep(2000);
