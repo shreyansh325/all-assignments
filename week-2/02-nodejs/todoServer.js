@@ -42,7 +42,6 @@
 
 const fs = require("fs");
 
-
 let counter = 1;
 
 function getUniqueNumber(){
@@ -57,14 +56,16 @@ function readTodos(){
 }
 
 function writeTodos(){
-  fs.writeFileSync(filepath, JSON.stringify(todos, null, 1));
+  console.log("New todos: ", JSON.stringify(todos))
+  console.log("Skipping write TODOs to file..")
+  // fs.writeFileSync(filepath, JSON.stringify(todos, null, 1));
 }
 
-// const todos = [
-//   { id: getUniqueNumber(), title: "do job" },
-//   { id: getUniqueNumber(), title: "get bored and die" },
-// ];
-const todos = readTodos();
+const todos = [
+  { id: getUniqueNumber(), title: "do job", description: "make the background" },
+  { id: getUniqueNumber(), title: "get bored and die", description: "set this as default screensaver :)" },
+];
+// const todos = readTodos();
 
 function getAllTodos(req, res) {
   res.json(todos);
@@ -94,8 +95,11 @@ function updateTodo(req, res){
   const id = req.params.id;
   for(let task of todos){
     if(task['id']==id){
-      task = req.body;
-      task['id']=id;
+      let updatedTask = req.body;
+      for(let key of ["title", "description", "completed"]) {
+        if(updatedTask[key])
+          task[key] = updatedTask[key];
+      }
       res.json(task);
       writeTodos();
       return;
@@ -124,10 +128,12 @@ function deleteTodo(req, res){
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const port = 3000;
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.get("/todos", getAllTodos);
 app.get("/todos/:id", getTodoById);
@@ -137,6 +143,6 @@ app.delete("/todos/:id", deleteTodo);
 
 // app.all('*', (req, res) => {res.status(404).send();});
 
-// app.listen(port, () => console.log('Server running on port 3000!'));
+app.listen(port, () => console.log('Server running on port 3000!'));
 
 module.exports = app;

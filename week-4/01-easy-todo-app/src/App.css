@@ -1,0 +1,24 @@
+.create-todo,
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem;
+  background-color: lightgray;
+  padding: 0 1rem;
+  border-radius: 5px;
+  height: 50px;
+}
+
+.checkbox {
+  cursor: pointer;
+}
+
+.todo-page {
+  justify-content: center;
+  width: 50%;
+}
+
+.is-complete {
+  text-decoration: line-through;
+}
