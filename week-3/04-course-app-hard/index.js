@@ -1,8 +1,10 @@
 const express = require('express');
+const cors = require("cors");
 const app = express();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose')
 
+app.use(cors());
 app.use(express.json());
 
 const adminKey = 'AdminSecretKey@1';
@@ -85,6 +87,10 @@ app.post('/admin/login', async (req, res) => {
   res.json({'message': 'Logged in successfully', token});
 });
 
+app.get('/admin/me', authenticateAdmin, (req, res) => {
+  res.json({'username': req.user.username});
+});
+
 app.post('/admin/courses', authenticateAdmin, async (req, res) => {
   let tmpCourse = new Course(req.body);
   const sameCourse = await Course.findOne({'title': tmpCourse.title});
@@ -108,6 +114,12 @@ app.put('/admin/courses/:courseId', authenticateAdmin, async (req, res) => {
 
 app.get('/admin/courses', authenticateAdmin, async (req, res) => {
   return res.json({'courses': await Course.find({})});
+});
+
+app.get('/admin/courses/:courseId', authenticateAdmin, async (req, res) => {
+  const id = req.params['courseId'];
+  const courseFound = await Course.findById(id);
+  return res.json(courseFound);
 });
 
 // User routes
@@ -150,6 +162,12 @@ app.post('/users/courses/:courseId', authenticateUser, async (req, res) => {
 
 app.get('/users/purchasedCourses', authenticateUser, async (req, res) => {
   return res.json({'purchasedCourses': (await req.user.populate('purchasedCourses')).purchasedCourses});
+});
+
+app.get('/users/courses/:courseId', authenticateUser, async (req, res) => {
+  const id = req.params['courseId'];
+  const courseFound = await Course.findById(id);
+  return res.json(courseFound);
 });
 
 app.listen(3000, () => {
