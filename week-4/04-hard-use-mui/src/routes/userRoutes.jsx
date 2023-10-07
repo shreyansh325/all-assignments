@@ -1,25 +1,25 @@
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
+import { Route, Routes } from "react-router-dom";
 import UserDashboard from "../components/User/UserDashboard";
 import Purchases from "../components/User/Purchases";
 
-import Signin from "../components/Common/Signin";
-import Signup from "../components/Common/Signup";
+import { Signin, Signup } from "../components/Common/Sign";
 import { ShowCourses } from "../components/Common/ShowCourses";
 import NotFound from "../components/Common/NotFound";
+
+import Auth from "../auth/Auth";
 
 function UserRoutes() {
   return (
     <>
+      {" "}
       <Routes>
         {/* user specific routes */}
-        <Route path="/" element={<UserDashboard />} />
-        <Route path="/purchases" element={<Purchases />} />
+        <Route path="/" element={<Auth Component={UserDashboard} />} />
+        <Route path="/purchases" element={<Auth Component={Purchases} />} />
         {/* user routes using common components */}
         <Route path="/signin" element={<Signin isAdmin={false} />} />
         <Route path="/signup" element={<Signup isAdmin={false} />} />
-        <Route path="/courses" element={<ShowCourses isAdmin={false} />} />
+        <Route path="/courses" element={<Auth Component={ShowCourses} />} />
         {/* Page Not found */}
         <Route path="/*" element={<NotFound />} />
       </Routes>

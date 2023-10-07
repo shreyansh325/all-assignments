@@ -144,10 +144,14 @@ app.post("/user/login", async (req, res) => {
     username: tmpUser.username,
     password: tmpUser.password,
   });
-  if (!validUser) res.status(403).json({ message: "Login failure" });
+  if (!validUser) return res.status(403).json({ message: "Login failure" });
   const payload = { username: validUser.username };
   const token = jwt.sign(payload, userKey, { expiresIn: "1h" });
   res.json({ message: "Logged in successfully", token });
+});
+
+app.get("/user/me", authenticateUser, (req, res) => {
+  res.json({ username: req.user.username });
 });
 
 app.get("/user/courses", authenticateUser, async (req, res) => {
@@ -158,7 +162,10 @@ app.post("/user/courses/:courseId", authenticateUser, async (req, res) => {
   try {
     const id = req.params.courseId;
     const course = Course.findOne({ _id: id });
-    if (course) {
+    if (!course)
+      return res.status(404).json({ message: "Error/Course not found" });
+    const alreadyBought = req.user.purchasedCourses.some((c) => c._id == id);
+    if (!alreadyBought) {
       req.user.purchasedCourses.push(id);
       await req.user.save();
       return res.json({ message: "Course purchased successfully" });
@@ -166,7 +173,7 @@ app.post("/user/courses/:courseId", authenticateUser, async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-  return res.status(404).json({ message: "Error/Course not found" });
+  return res.status(404).json({ message: "Failed to purchase course" });
 });
 
 app.get("/user/purchasedCourses", authenticateUser, async (req, res) => {
