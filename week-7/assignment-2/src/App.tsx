@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import {RecoilRoot} from 'recoil';
-import Login from './Components/Login';
+import {Login} from './Components/Login';
 import Signup from './Components/Signup';
 import TodoList from './Components/TodoList';
 import { useNavigate } from 'react-router-dom';
@@ -30,24 +30,26 @@ function InitState() {
 
     const init = async () => {
         const token = localStorage.getItem("token");
-        try {
-            const response = await fetch('http://localhost:3000/auth/me', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (data.username) {
-                setAuth({ token: data.token, username: data.username });
-                navigate("/todos");
-            } else {
+        if(token){
+            try {
+                const response = await fetch('http://localhost:3000/auth/me', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (data.username) {
+                    setAuth({ token: data.token, username: data.username });
+                    navigate("/todos");
+                } else {
+                    navigate("/login");
+                }
+            } catch (e) {
                 navigate("/login");
             }
-        } catch (e) {
-            navigate("/login");
         }
     }
     useEffect(() => {
         init();
-    }, [])
+    })
     return <></>
 }
 

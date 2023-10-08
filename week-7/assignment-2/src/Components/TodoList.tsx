@@ -1,9 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { authState } from '../store/authState.js';
 import {useRecoilValue} from "recoil";
 
+interface TodoItemInterface {
+    userId: string;
+    title: string;
+    description?: string;
+    done: boolean;
+    _id: string;
+}
+
 const TodoList = () => {
-    const [todos, setTodos] = useState([]);
+    const [todos, setTodos] = useState<TodoItemInterface[]>([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const authStateValue = useRecoilValue(authState);
@@ -13,12 +21,11 @@ const TodoList = () => {
             const response = await fetch('http://localhost:3000/todo/todos', {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
             });
-            // Todo: Create a type for the response that you get back from the server
-            const data = await response.json();
+            const data: TodoItemInterface[] = await response.json();
             setTodos(data);
         };
         getTodos();
-    }, [authState.token]);
+    }, [authStateValue.token]);
 
     const addTodo = async () => {
         const response = await fetch('http://localhost:3000/todo/todos', {
@@ -26,11 +33,11 @@ const TodoList = () => {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem("token")}` },
             body: JSON.stringify({ title, description })
         });
-        const data = await response.json();
+        const data: TodoItemInterface = await response.json();
         setTodos([...todos, data]);
     };
 
-    const markDone = async (id) => {
+    const markDone = async (id: string) => {
         const response = await fetch(`http://localhost:3000/todo/todos/${id}/done`, {
             method: 'PATCH',
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -46,7 +53,7 @@ const TodoList = () => {
                 <div style={{marginTop: 25, marginLeft: 20}}>
                     <button onClick={() => {
                         localStorage.removeItem("token");
-                        window.location = "/login";
+                        window.location.assign("/login");
                     }}>Logout</button>
                 </div>
             </div>
