@@ -3,6 +3,7 @@ const cors = require("cors");
 const app = express();
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const conStr = require("./secret");
 
 app.use(cors());
 app.use(express.json());
@@ -10,9 +11,7 @@ app.use(express.json());
 const adminKey = "AdminSecretKey@1";
 const userKey = "UserSecretKey@2";
 
-mongoose.connect(
-  "mongodb+srv://shreyansh325:B5gRCXnLbyNCe0nm@cluster0.cqiajmm.mongodb.net/course"
-);
+mongoose.connect(conStr); //insert connection string
 
 const adminSchema = new mongoose.Schema({
   username: String,

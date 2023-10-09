@@ -2,6 +2,7 @@ import express from "express";
 import { authenticateJwt, SECRET } from "../middleware/index";
 import { Todo } from "../db";
 import mongoose from "mongoose";
+import { z } from "zod";
 
 const router = express.Router();
 
@@ -12,8 +13,16 @@ interface TodoItemInterface {
   userId: mongoose.Types.ObjectId;
 }
 
+const TodoInputValidator = z.object({
+  title: z.string().min(1).max(20),
+  description: z.string().min(1).max(100),
+});
+
 router.post('/todos', authenticateJwt, (req, res) => {
-  const { title, description } = req.body;
+  const parsedData = TodoInputValidator.safeParse(req.body);
+  if(!parsedData.success)
+    return res.status(411).json({"message": parsedData.error.message});
+  const {title, description} = parsedData.data;
   const done = false;
   const userId = new mongoose.Types.ObjectId(req.headers["userId"]?.toString());
   const todoItem: TodoItemInterface = { title, description, done, userId };

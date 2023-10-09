@@ -7,3 +7,7 @@ week-7/assignment-1/node_modules
 week-7/assignment-1/secret.ts
 week-7/assignment-1/dist
 week-7/temp-assignment-2/node_modules
+course-app/server/secrets.ts
+course-app/server/dist/secrets.ts
+course-app/server/node_modules
+course-app/client/node_modules
